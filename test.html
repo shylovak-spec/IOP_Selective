@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестування - Охорона Праці</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #000;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #fff;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.5em;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #fff;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            margin-bottom: 30px;
+        }
+        label.main-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #111;
+            border: 1px solid #fff;
+            color: #fff;
+            font-size: 1.1em;
+            box-sizing: border-box;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px dashed #444;
+        }
+        .question p {
+            font-size: 1.1em;
+            margin-top: 0;
+            font-weight: bold;
+        }
+        .options label {
+            display: block;
+            font-weight: normal;
+            font-size: 1em;
+            cursor: pointer;
+            padding: 8px;
+            transition: background 0.2s;
+        }
+        .options label:hover {
+            background: #222;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background-color: #ffcc00;
+            color: #000;
+            padding: 15px;
+            border: none;
+            font-weight: bold;
+            font-size: 1.2em;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-submit:hover:not(:disabled) {
+            background-color: #e6b800;
+        }
+        .btn-submit:disabled {
+            background-color: #555 !important;
+            color: #888;
+            cursor: not-allowed;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #ccc;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-link">← Назад до інструкцій</a>
+    <h1>Тестування знань</h1>
+
+    <form id="quiz-form">
+        <div class="input-group">
+            <label for="surname" class="main-label">Ваше Прізвище:</label>
+            <input type="text" id="surname" name="surname" required placeholder="Введіть прізвище...">
+        </div>
+
+        <div id="questions-container"></div>
+
+        <button type="submit" class="btn-submit" id="submit-btn">Відправити результат</button>
+    </form>
+</div>
+
+<script>
+    // 1. Повний список питань (20 штук)
+    const allQuestions = [
+        {
+            q: "Яким є співвідношення натискань на грудну клітку та вдихів при реанімації?",
+            options: ["15 натискань / 5 вдихів", "30 натискань / 2 вдихи", "10 натискань / 1 вдих"],
+            correct: 1
+        },
+        {
+            q: "Що потрібно зробити в першу чергу при термічному опіку?",
+            options: ["Змастити олією або пантенолом", "Проколоти пухирі", "Охолодити місце опіку"],
+            correct: 2
+        },
+        {
+            q: "Як слід пересуватися в зоні крокової напруги?",
+            options: ["Швидко бігти довгими кроками", "Стрибати на обох ногах", "«Гусячим кроком», не відриваючи стопи одна від одної"],
+            correct: 2
+        },
+        {
+            q: "Що заборонено використовувати для гасіння електроустановок під напругою?",
+            options: ["Воду або піну", "Вуглекислотний вогнегасник", "Порошковий вогнегасник"],
+            correct: 0
+        },
+        {
+            q: "Як правильно витягувати вилку з розетки?",
+            options: ["Тягнути за електричний шнур", "Різко висмикнути за провід", "Тримаючись за корпус штепсельної вилки"],
+            correct: 2
+        },
+        {
+            q: "Яка дія є обов’язковою при отруєнні парами ізопропілового спирту?",
+            options: ["Вивести потерпілого на чисте повітря", "Дати випити холодної води", "Дати випити теплої води"],
+            correct: 0
+        },
+        {
+            q: "Як правильно піднімати важкі предмети з підлоги?",
+            options: ["Різким ривком вгору", "Нахилитись вперед на прямих ногах", "Присісти і з прямою спиною, відштовхуючись ногами"],
+            correct: 2
+        },
+        {
+            q: "Дія при відчутті навіть слабкої дії струму від корпусу інструмента?",
+            options: ["Продовжити роботу в гумових рукавичках", "Допрацювати зміну і здати в ремонт", "Негайно вимкнути та доповісти керівнику"],
+            correct: 2
+        },
+        {
+            q: "Яка мінімально допустима відстань від очей до екрана монітора?",
+            options: ["20-30 см", "30-40 см", "50-60 см"],
+            correct: 2
+        },
+        {
+            q: "Що забороняється робити для видалення зайвого припою з жала паяльника?",
+            options: ["Витирати об спеціальну серветку", "Струшувати паяльник", "Використовувати підставку"],
+            correct: 1
+        },
+        {
+            q: "Яка вимога до встановлення паяльника під час короткочасних перерв у роботі?",
+            options: ["Можна покласти на стіл", "Має бути вимкнений з мережі", "Має бути встановлений на вогнетривку підставку"],
+            correct: 2
+        },
+        {
+            q: "Яка перша дія працівника при виявленні несправності обладнання на дільниці?",
+            options: ["Негайно припинити роботу та повідомити керівника", "Самостійно полагодити", "Повідомити колегу по зміні"],
+            correct: 0
+        },
+        {
+            q: "Виберіть правильну тезу:",
+            options: ["На робочому місці дозволяється зберігати особисті речі та сторонні предмети.", "Забороняється захаращувати проходи та робочі місця сторонніми предметами.", "Проходи до засобів пожежогасіння можуть бути частково перекриті тарою"],
+            correct: 1
+        },
+        {
+            q: "Яка вимога до робочих поверхонь інструментів з ручками (наприклад,викрутки)?",
+            options: ["Дозволяється мати невеликі тріщини", "Мають бути змащені мастилом", "Повинні бути гладкими, без задирок, тріщин та сколів"],
+            correct: 2
+        },
+        {
+            q: "Яку мінімальну групу з електробезпеки повинен мати працівник?",
+            options: ["I групу з електробезпеки", "II групу з електробезпеки", "Достатньо вступного інструктажа"],
+            correct: 0
+        },
+        {
+            q: "Коли фільтруючий протигаз вважається відпрацьованим (непридатним)?",
+            options: ["Після 1 години використання", "При появі стороннього запаху в підмасочному просторі", "При зміні кольору маски"],
+            correct: 1
+        },
+        {
+            q: "Що заборонено робити під час роботи шпинделя депанелізатора?",
+            options: ["Спостерігати за процесом", "Регулювати яскравість монітору", "Відкривати захисні дверцята"],
+            correct: 2
+        },
+        {
+            q: "Яка вимога до організації робочого місця паяльщика є головною?",
+            options: ["Наявність крісла", "Обовʼязкова робоча місцева витяжка", "Розташування паяльніка зліва"],
+            correct: 1
+        },
+        {
+            q: "Виберіть правильну тезу щодо поведінки на робочому місці",
+            options: ["Заборонено залишати пяльник ввімкненим без нагляду на столі", "Дозволяється очищення залишків каніфолі струшуванням з жала.", "Заборонено тримати паяльник в руках у вімкненому стані."],
+            correct: 0
+        },
+        {
+            q: "Виберіть правильну дію при несправності протигаза в зоні зараження",
+            options: ["Послабити маску, щоб полегшити дихання", "Негайно змінити фільтр, не виходячи з зони", "Негайно вийти з небезпечної зони, не знімаючи маску"],
+            correct: 2
+        }
+    ];
+
+    function getRandomQuestions(arr, n) {
+        let shuffled = [...arr].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, n);
+    }
+
+    const selectedQuestions = getRandomQuestions(allQuestions, 5);
+    const container = document.getElementById('questions-container');
+
+    selectedQuestions.forEach((item, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question';
+        
+        let optionsHTML = '';
+        item.options.forEach((opt, optIndex) => {
+            optionsHTML += `
+                <label>
+                    <input type="radio" name="q${index}" value="${optIndex}" required>
+                    ${opt}
+                </label>
+            `;
+        });
+
+        questionDiv.innerHTML = `
+            <p>${index + 1}. ${item.q}</p>
+            <div class="options">${optionsHTML}</div>
+        `;
+        container.appendChild(questionDiv);
+    });
+
+    document.getElementById('quiz-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('submit-btn');
+        const surname = document.getElementById('surname').value;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerText = "ВІДПРАВКА...";
+
+        let score = 0;
+        selectedQuestions.forEach((item, index) => {
+            const selectedAnswer = document.querySelector(`input[name="q${index}"]:checked`).value;
+            if (parseInt(selectedAnswer) === item.correct) {
+                score++;
+            }
+        });
+
+        const percentage = Math.round((score / selectedQuestions.length) * 100);
+        const data = { surname: surname, percentage: percentage };
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwf-0KO_I-a_o8hzk_NlE1TEcsVIGKt_U2lZlAgyf7-FwAL-vNBbjKspW29B5yxfnsroA/exec';
+
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            submitBtn.innerText = "ГОТОВО!";
+            submitBtn.style.backgroundColor = "#28a745"; 
+            
+            setTimeout(() => {
+                alert(`Дякуємо! Ваш результат: ${percentage}%. Дані збережено.`);
+                window.location.href = 'index.html';
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Помилка!', error);
+            alert('Сталася помилка при відправці.');
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Відправити результат";
+        });
+    });
+</script>
+
+</body>
+</html>
